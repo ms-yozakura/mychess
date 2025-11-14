@@ -1,0 +1,3 @@
+/Users/amot/Documents/PROGRAMS/chess/chess-ver3.0/build/CMakeFiles/chess.dir
+/Users/amot/Documents/PROGRAMS/chess/chess-ver3.0/build/CMakeFiles/edit_cache.dir
+/Users/amot/Documents/PROGRAMS/chess/chess-ver3.0/build/CMakeFiles/rebuild_cache.dir
