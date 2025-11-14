@@ -5,8 +5,8 @@
 .DS_Store
 .qmake.stash
 Makefile
-myapp.pro
-myapp.app/
+chess-app.pro
+chess-app.app/
 tmp/
 
 # Build directories
