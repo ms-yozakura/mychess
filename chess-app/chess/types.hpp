@@ -74,7 +74,8 @@ struct Move
         // Undo情報はMoveの同一性に関わらないため、比較しない
         return from == other.from &&
                to == other.to &&
-               promotedTo == other.promotedTo &&
+               promotedTo == other.promotedTo
+                // &&
             //
             //    isEnPassant == other.isEnPassant &&
             //    isCastling == other.isCastling

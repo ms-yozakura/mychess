@@ -8,9 +8,10 @@
 #include <vector>
 #include <utility>
 #include "chess/types.hpp"
+#include "widget/chess_board_view.hpp" // 新しいヘッダをインクルード
 
 class ChessGame;
-class ChessBoardWidget;
+// class ChessBoardWidget;
 struct Move;
 
 class MainWindow : public QMainWindow
@@ -40,7 +41,8 @@ private:
 
     // UIエレメント
     QLabel *m_label;
-    ChessBoardWidget *m_boardWidget;
+    // ChessBoardWidget *m_boardWidget;
+    ChessBoardView *m_boardView;        // (新)
     QString s_selectedSquare;
 
     bool m_turnWhite = true;

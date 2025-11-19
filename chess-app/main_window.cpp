@@ -4,8 +4,9 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 #include <QDebug>
-#include "chess/chess_game.hpp"          // ChessGame
-#include "widget/chess_board_widget.hpp" // ChessBoardWidget
+#include "chess/chess_game.hpp" // ChessGame
+// #include "widget/chess_board_widget.hpp" // ChessBoardWidget
+#include "widget/chess_board_view.hpp" // 新しいヘッダをインクルード
 #include <QFile>
 #include <QInputDialog>
 #include <QMessageBox>
@@ -18,10 +19,9 @@ MainWindow::MainWindow(ChessGame *game, QWidget *parent)
     setWindowTitle("Chess");
     setupUI();
     setupConnections();
-    m_boardWidget->setBoardFromFEN(m_game->getBoardStateFEN(false));
+    // m_boardWidget->setBoardFromFEN(m_game->getBoardStateFEN(false));
+    m_boardView->setBoardFromFEN(m_game->getBoardStateFEN(false)); // (新)
 }
-
-// UI要素の構築とスタイルの設定
 void MainWindow::setupUI()
 {
     // 中央ウィジェット
@@ -33,36 +33,38 @@ void MainWindow::setupUI()
     // ファイルを開く
     if (file.open(QFile::ReadOnly | QFile::Text))
     {
-        // ストリームを作成し、ファイルの内容を全て読み込む
         QTextStream stream(&file);
         QString styleSheet = stream.readAll();
-
-        // ファイルを閉じる
         file.close();
-
-        // プリケーション全体にスタイルシートを適用
         central->setStyleSheet(styleSheet);
     }
 
     // UI要素の初期化
-    // タイトル
     m_label = new QLabel("Hello World");
-    // 盤面
-    m_boardWidget = new ChessBoardWidget;
 
-    // レイアウトの設定
+    // 盤面: 新しい ChessBoardView を初期化
+    m_boardView = new ChessBoardView(this);
+
+    // ★ 修正後のレイアウト設定 ★
+    // layout1 (盤面 + 情報パネル)
     QHBoxLayout *layout1 = new QHBoxLayout;
     layout1->setContentsMargins(20, 20, 20, 20);
     layout1->setSpacing(15);
+
+    // layout2 (情報パネル: タイトル、ログなど)
     QVBoxLayout *layout2 = new QVBoxLayout;
     layout2->setContentsMargins(20, 20, 20, 20);
     layout2->setSpacing(15);
 
+    // 情報パネルの内容を追加
     layout2->addWidget(m_label);
+    // ... (他の情報ウィジェットがあればここに追加) ...
 
-    layout1->addWidget(m_boardWidget);
+    // メインレイアウトに盤面と情報パネルを追加
+    layout1->addWidget(m_boardView); // ★ m_boardView をレイアウトに追加 ★
     layout1->addLayout(layout2);
 
+    // 中央ウィジェットに最終レイアウトを設定
     central->setLayout(layout1);
 }
 
@@ -70,11 +72,11 @@ void MainWindow::setupUI()
 void MainWindow::setupConnections()
 {
     // モーター制御ボタン (スロットはそのまま)
-    QObject::connect(m_boardWidget, &ChessBoardWidget::squareClicked,
+    QObject::connect(m_boardView, &ChessBoardView::squareClicked, // (新) m_boardViewを使用
                      this, &MainWindow::handleSquareClick);
-    // ★ 新しい接続: 合法手情報をBoardWidgetに渡す
+    // 合法手情報をBoardWidgetに渡す
     QObject::connect(this, &MainWindow::updateLegalMoves,
-                     m_boardWidget, &ChessBoardWidget::handleLegalMoves);
+                     m_boardView, &ChessBoardView::handleLegalMoves); // (新) m_boardViewを使用
 }
 
 void MainWindow::handleSquareClick(const QString &algebraicCoord)
@@ -153,7 +155,8 @@ void MainWindow::handleSquareClick(const QString &algebraicCoord)
                 if (m_game->isEnd(m_turnWhite))
                 {
                     // 移動後の盤面更新と、合法手リストのリセット
-                    m_boardWidget->setBoardFromFEN(m_game->getBoardStateFEN(false));
+                    // m_boardWidget->setBoardFromFEN(m_game->getBoardStateFEN(false)); // (旧)
+                    m_boardView->setBoardFromFEN(m_game->getBoardStateFEN(false)); // (新)
 
                     // 合法手リストを空にして、強調表示を消す
                     emit updateLegalMoves({});
@@ -161,6 +164,9 @@ void MainWindow::handleSquareClick(const QString &algebraicCoord)
                     s_selectedSquare.clear(); // 選択解除
                     QMessageBox::information(this, tr("You win"), tr("you are good chess player"));
                 }
+
+                // m_boardWidget->setBoardFromFEN(m_game->getBoardStateFEN(false)); // (旧)
+                m_boardView->setBoardFromFEN(m_game->getBoardStateFEN(false)); // (新)
 
                 std::cout << "AI (Black) is thinking...\n";
 
@@ -174,8 +180,8 @@ void MainWindow::handleSquareClick(const QString &algebraicCoord)
                 if (m_game->isEnd(m_turnWhite))
                 {
                     // 移動後の盤面更新と、合法手リストのリセット
-                    m_boardWidget->setBoardFromFEN(m_game->getBoardStateFEN(false));
-
+                    // m_boardWidget->setBoardFromFEN(m_game->getBoardStateFEN(false)); // (旧)
+                    m_boardView->setBoardFromFEN(m_game->getBoardStateFEN(false)); // (新)
                     // 合法手リストを空にして、強調表示を消す
                     emit updateLegalMoves({});
                     currentLegalMoves = {};
@@ -188,8 +194,8 @@ void MainWindow::handleSquareClick(const QString &algebraicCoord)
             }
 
             // 移動後の盤面更新と、合法手リストのリセット
-            m_boardWidget->setBoardFromFEN(m_game->getBoardStateFEN(false));
-
+            // m_boardWidget->setBoardFromFEN(m_game->getBoardStateFEN(false)); // (旧)
+            m_boardView->setBoardFromFEN(m_game->getBoardStateFEN(false)); // (新)
             // 合法手リストを空にして、強調表示を消す
             emit updateLegalMoves({});
             currentLegalMoves = {};
